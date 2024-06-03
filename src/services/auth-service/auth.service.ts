@@ -1,14 +1,15 @@
 import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
-import { User } from "src/domain/entities/user.entity";
-import { Status, UserType } from "src/domain/enums/user.type";
-import { LoginDto } from "src/domain/model/request/login.dto";
-import { RegisterDto } from "src/domain/model/request/register.dto";
-import { VerifyOTPDto } from "src/domain/model/request/verify.dto";
-import { ApiResponseBuilder, ApiResponses } from "src/domain/model/response/api.response";
-import { UserRepository } from "src/domain/repository/user.repository";
+import { User } from "../../domain/entities/user.entity";
+import { Status, UserType } from "../../domain/enums/user.type";
+import { LoginDto } from "../../domain/model/request/login.dto";
+import { RegisterDto } from "../../domain/model/request/register.dto";
+import { VerifyOTPDto } from "../../domain/model/request/verify.dto";
+import { ApiResponseBuilder, ApiResponses } from "../../domain/model/response/api.response";
+import { UserRepository } from "../../domain/repository/user.repository";
 import * as bcrypt from 'bcrypt';
-import { OTP } from "src/domain/entities/otp.entity";
-import { OTPRepository } from "src/domain/repository/otp.repository";
+import { OTP } from "../../domain/entities/otp.entity";
+import { OTPRepository } from "../../domain/repository/otp.repository";
+import { generateOTP } from "../../helpers/utils.helper";
 @Injectable()
 export class AuthService {
 
@@ -27,7 +28,11 @@ export class AuthService {
         throw new Error("Method not implemented.");
     }
     async  signIn(loginDto: LoginDto):Promise<ApiResponses<string>>  {
-        throw new Error("Method not implemented.");
+        const user =  this.userRepository.findOneByEmail(loginDto.email);
+        if(user){
+            const status = bcrypt
+        }
+        return null;
     }
    async createUser(registerDto: RegisterDto): Promise<ApiResponses<string>> {
 
@@ -61,9 +66,9 @@ export class AuthService {
     }
 
     private async sendVerificationOTP(user: User): Promise<void> {
-        const otp = this.generateOTP(4);
+        const otp = generateOTP(4);
         try {
-            await this.saveOTPToDatabase(otp, user);
+            await this.saveOTPtoDatabase(otp, user);
             const queue ="otp_message";
           //  await this.rabbitMQService.sendMessageOTP({ otp:otp, email:user.email},queue );
         } catch (error) {
@@ -71,18 +76,10 @@ export class AuthService {
         }
     }
 
-    private generateOTP(length: number): string {
-        const chars = '0123456789'; 
-        let otp = '';
-        for (let i = 0; i < length; i++) {
-            const index = Math.floor(Math.random() * chars.length); 
-            otp += chars[index];
-        }
-        return otp;
-    }
+
     
 
-    private async saveOTPToDatabase(otp: string, user: User): Promise<void> {
+    private async saveOTPtoDatabase(otp: string, user: User): Promise<void> {
         const saveOTP = new OTP();
         saveOTP.otp = otp;
         const expirationTime = new Date();

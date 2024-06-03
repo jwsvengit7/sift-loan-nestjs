@@ -3,12 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 
 import * as dotenv from 'dotenv';
-import { User } from 'src/domain/entities/user.entity';
-import { OTP } from 'src/domain/entities/otp.entity';
-import { AuthController } from 'src/controllers/auth.controller';
+import { User } from '../../../domain/entities/user.entity';
+import { OTP } from '../../../domain/entities/otp.entity';
+import { AuthController } from '../../../controllers/auth.controller';
 import { AuthService } from '../auth.service';
-import { UserRepository } from 'src/domain/repository/user.repository';
-import { JWTStartegy } from 'src/security/jwt.service';
+import { UserRepository } from '../../../domain/repository/user.repository';
+import { JWTStartegy } from '../../../security/jwt.service';
 dotenv.config();
 const secret=process.env.JWT_SECRET as string;
 @Module({
